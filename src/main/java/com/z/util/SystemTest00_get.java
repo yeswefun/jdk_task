@@ -1,7 +1,5 @@
 package com.z.util;
 
-import java.io.IOException;
-
 class SystemTest00_get {
 
     public static void main(String[] args) {

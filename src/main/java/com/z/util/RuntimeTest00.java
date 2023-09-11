@@ -1,7 +1,5 @@
 package com.z.util;
 
-import static com.z.util.IO.println;
-
 class RuntimeTest00 {
     /*
         Runtime
@@ -23,13 +21,13 @@ class RuntimeTest00 {
      */
     public static void main(String[] args) {
         Runtime rt = Runtime.getRuntime();
-        println("available process: " + rt.availableProcessors());
+        System.out.println("available process: " + rt.availableProcessors());
 
-        println("maxMemory(JVM): " + readableUnit(rt.maxMemory()));
-        println("totalMemory(JVM): " + readableUnit(rt.totalMemory()));
-        println("freeMemory(JVM): " + readableUnit(rt.freeMemory()));
+        System.out.println("maxMemory(JVM): " + readableUnit(rt.maxMemory()));
+        System.out.println("totalMemory(JVM): " + readableUnit(rt.totalMemory()));
+        System.out.println("freeMemory(JVM): " + readableUnit(rt.freeMemory()));
         rt.gc();
-        println("freeMemory(JVM): " + readableUnit(rt.freeMemory()));
+        System.out.println("freeMemory(JVM): " + readableUnit(rt.freeMemory()));
     }
 
     /*
