@@ -1,0 +1,173 @@
+
+
+2.Java并发包工具
+    2.1 CountDownLatch
+    2.2 CyclicBarrier
+    2.3 Exchanger
+    2.4 Semaphore
+    2.5 Lock
+    2.6 ReadWriteLock
+    2.7 ForkJoin
+    2.8 Phaser
+    2.9 Condition
+
+
+AQS, AbstractQueuedSynchronizer
+
+
+
+2.1 CountDownLatch
+    阅读文档注释
+
+    过一遍所有api
+
+    一个线程等待多个线程完成任务，才继续往下执行
+    多个线程等待一个线程完成任务，才继续往下执行
+
+    如何给离散平行任务添加逻辑层次关系
+
+
+
+2.2 CyclicBarrier
+    阅读文档注释
+
+    过一遍所有api
+
+    多个线程等待某个条件满足，此时这些线程才能继续往下执行
+
+    CountDownLatch VS CyclicBarrier
+        1.CountDownLatch 不能 reset, 而 CyclicBarrier 是可以循环使用的
+        2.CountDownLatch 工作线程之间互不关心。CyclicBarrier 工作线程必须等到同一个共同的点才去执行执行某个动作
+
+    boolean isBroken()
+    void reset();
+
+    CountDownLatch 引入 回调机制
+
+
+
+
+2.3 Exchanger
+
+    阅读文档注释
+
+    过一遍所有api
+
+    两个线程交换数据
+
+    V r = Exchanger#exchange(V v)
+        v = params ->
+        r = result <-
+
+    必须两个线程都调用 exchange 才能获取对方各自的返回值，
+    否则 先调用 exchange 的一方会被阻塞
+        linux - 管道, pipe
+
+    Exchanger 只适合 两个线程的交互
+
+    线程A中的参数 与 线程B中的返回值 是否是 同一份
+        是同一份
+
+    Exchanger 是否可以重复使用
+        可以重复使用
+
+
+
+2.4 Semaphore
+
+    阅读文档注释
+
+    过一遍所有api
+        public Semaphore(int permits)
+
+        public void acquire() throws InterruptedException
+        public void release()
+
+        public void acquire(int permits) throws InterruptedException
+        public void release(int permits)
+
+    显式锁 必须 使用 try ... finally ...
+
+        //LOCK.lock();      //没有抛出异常
+        try {
+            LOCK.lock();    //抛出异常
+        } finally {
+            LOCK.unlock();
+        }
+
+    锁不够用时，会阻塞请求锁的线程
+
+    可中断
+        Semaphore#accquire();
+        Semaphore#accquire(timeout, unit);
+
+    不可中断
+        Semaphore#acquireUninterruptibly();
+
+    获取所有可用的
+        Semaphore#drainPermits
+
+    自定义的锁
+        读写分离锁
+        信号量锁
+
+    synchronized 与 Semaphore 的区别
+        synchronized 同一时刻只能有一个线程持有锁
+        Semaphore 同一时刻可以有多个线程持有锁
+
+    连接池
+        当没有可用的连接
+        1. get 1000MS then throw exception
+        2. blocking
+        3. discard
+        4. get then throw exception
+        5. get->register the callback to call you.
+
+
+    isFair()
+    tryAcquire();
+    tryAcquire(timeout, unit);
+
+
+
+2.5 Lock
+    ReentrantLock
+        公平 与 非公平
+
+
+2.6 ReadWriteLock
+
+
+
+2.9 Condition
+    替代 wait, notify, notifyAll
+
+    Condition 对比 wait, notify, notifyAll
+
+    多生产者多消费者模型
+
+
+2.7 ForkJoin
+
+
+StampedLock
+    1.8
+
+2.8 Phaser
+
+
+
+
+为什么会出现?
+
+
+公平锁 与 非公平锁
+
+乐观锁 与 悲观锁
+
+显式锁 与 隐式锁
+
+可重入锁 与 不可重入锁
+
+共享锁 与 独占锁(排他锁)
+

@@ -1,0 +1,169 @@
+
+
+3.Executors框架详细介绍
+    2.1 Executor
+    2.2 ThreadPoolExecutor
+    2.3 Future&Callable
+    2.4 CompletionService
+    2.5 ScheduledExecutorService
+    2.6 ExecutorService
+    2.7 ThreadFactory
+    2.8 CompletableFuture, jdk1.8
+
+
+类结构
+    Executor
+        ExecutorService
+            AbstractExecutorService
+                ThreadPoolExecutor
+
+
+线程池七大参数
+ThreadPoolExecutor(
+    int corePoolSize,
+    int maximumPoolSize,
+    long keepAliveTime,
+    TimeUnit unit,
+    BlockingQueue<Runnable> workQueue,
+    ThreadFactory threadFactory,
+    RejectedExecutionHandler handler
+)
+
+线程程的关闭方式
+    shutdown
+        awaitTermination
+    shutdownNow
+
+
+ThreadFactory
+
+
+线程池的工厂方法
+    ExecutorService executorService = Executors.newCachedThreadPool();
+        有条件自动关闭，不断创建thread
+    ExecutorService executorService = Executors.newFixedThreadPool(10);
+        不会自动关闭
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
+        不会自动关闭
+
+    jdk1.8
+    ExecutorService executorService = Executors.newWorkStealingPool();
+        自动关闭
+
+
+API 详解
+    Executor
+        ExecutorService
+            AbstractExecutorService
+                ThreadPoolExecutor
+
+四大内置拒绝策略
+    AbortPolicy
+    DiscardPolicy
+    DiscardOldestPolicy
+        移除队列中最旧的的，然后再将新的放入队列
+    CallerRunsPolicy
+        如果 线程池 没有 shutdown，则直接执行任务
+        调用者所有的线程
+
+
+自定义任务判断是否出现错误
+
+@FunctionalInterface
+public interface Callable<V> {
+    Computes a result, or throws an exception if unable to do so.
+    @return computed result
+    @throws Exception if unable to compute a result
+    V call() throws Exception;
+}
+
+Future API
+    get InterruptException打断的是谁
+    cancel 打断的是谁
+
+
+CompletionService，在 jdk1.8 之后可以不用
+
+    ExecutorCompletionService
+
+    Future的缺点，在 jdk1.8 之前
+        Future 可以 同步任务，异步执行
+            不能 callback
+            future.get() // 阻塞
+
+        mina
+        netty
+        guava
+
+
+
+ExecutorCompletionService
+    ms
+        100
+        10
+
+    get
+        100, 碰巧
+        10
+
+    take - 总是能获取最先执行完的任务的结果
+        10
+        100
+
+
+
+ScheduledExecutorService
+    public interface ScheduledExecutorService
+        extends ExecutorService {}
+
+        // Runnable 没有返回值，为什么还要返回 ScheduledFuture 呢?
+        // ScheduledFuture 是用来取消任务的
+        public ScheduledFuture<?> schedule(
+            Runnable command,
+            long delay,
+            TimeUnit unit
+        );
+
+    public class ScheduledThreadPoolExecutor
+        extends ThreadPoolExecutor
+        implements ScheduledExecutorService {}
+
+
+
+CompletableFuture
+    一批 Future，无法获取最先执行完的任务的结果
+        CompletionService
+
+    Future#get
+        有可能被 blocked
+        CompletableFuture.runAsync().whenComplete()
+
+    每个任务对应一个 Future
+
+
+CompletableFuture 尽量不要使用它的构造，而是使用它的静态方法
+    intermediate - T
+        whenComplete
+            进出相同类型
+        whenCompleteAsync
+        thenApply
+        thenApplyAsync
+        handle
+            进出可以是不同类型
+        handleAsync
+
+    intermediate - Void
+        thenAccept
+        thenAcceptAsync
+        thenRun
+        thenRunAsync
+
+    terminated
+        complete
+
+
+
+
+学一项技术，要知道为什么要有它?
+
+重复是最好的导师

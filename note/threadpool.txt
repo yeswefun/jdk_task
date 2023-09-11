@@ -1,0 +1,65 @@
+
+
+
+核心线程数量(core) 和 最大线程数量(max)
+    线程池 根据 core 和 max 自动调整线程数量。
+    当线程数量小于core时，即使其他线程空闲，添加新任务也会新建线程。
+    当线程数量在 core 和 max 之间时，只有当队列满时，才会新建线程。
+    当设置 core == max 将会得到一个固定线程数量的线程池。
+    当设置 max 为无限大时，相当于允许线程池自适应执行并发任务的数量。
+
+
+线程启动时机
+    默认执行任务时创建，可以通过调用 prestartCoreThread() 和 prestartAllCoreThreads() 方法提前创建。
+
+
+存活时间
+    当 core == max 时，存活时间无效
+    当线程数量超过 core，超过存活时间的闲置线程将被结束。
+    默认不会结束核心线程，但是可以通过设置允许结束核心线程，使存活时间对核心线程生效
+
+
+队列
+    BlockingQueue用于转移和放置任务：
+        1、如果线程数量小于核心数量，任务会跳过队列直接被执行
+        2、如果超过核心线程数量的任务在执行，任务将被放入队列而不是创建新线程
+        3、如果任务无法放入队列，将会创建新线程。但是线程数量超过最大值时，任务将被拒绝。
+
+
+三种队列模式
+
+    直接交接
+        SynchronousQueue 直接将任务交给线程，不会持有任务。
+        为防止没有线程立即执行任务导致任务失败，会马上创建一个新线程。
+        为避免任务失败，这种模式一般要求max数量无限大
+
+    无限队列
+        使用无限队列（例如LinkedBlockingQueue），可以在核心线程繁忙时，将任务添加到队列中。
+        因此，不会有超过core数量的线程被创建，max将无效。
+
+    有限队列
+        有限队列 和 指定 max 的 线程池 搭配，可以限制资源耗尽，同时也难以控制。
+
+        队列和线程数量相互制约：
+            大队列和小线程池，会导致吞吐量小
+            小队列大线程池，cpu将会繁忙，同样会导致吞吐量小
+
+
+拒绝策略
+    当线程池关闭 或者 队列和线程数量都装满 时，提交任务将会失败。可以通过RejectedExecutionHandler监听。
+
+    系统提供了四种预置的方法：
+        1、 ThreadPoolExecutor.AbortPolicy
+            默认策略是抛出异常** RejectedExecutionException **
+
+        2、ThreadPoolExecutor.CallerRunsPolicy
+            调用execute本身的线程执行任务，将降低新任务提交的速度
+
+        3、ThreadPoolExecutor.DiscardPolicy
+            简单删除无法执行的任务
+
+        4、ThreadPoolExecutor.DiscardOldestPolicy
+            如果线程池没有关闭，则头部的任务将被删除
+
+
+https://blog.csdn.net/qq_23049111/article/details/118824331
